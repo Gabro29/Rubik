@@ -12,6 +12,4 @@ in a way rude.
 
 Next step is to build an AI to solve it automatically.
 
-Feel free to download and edit it for your purpouse.
-
-See you soon.
+Feel free to download and edit it for your purpouse
