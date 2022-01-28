@@ -1,7 +1,7 @@
 # Rubik
 Rubik's Cube in pygame with OpenGL
 
-The script show on the screen a Rubik Cube buit 
+The script show on the screen a Rubik Cube built 
 with OpenGL.
 
 Then I have also implemented all the possible moves as 
