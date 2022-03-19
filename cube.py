@@ -1,11 +1,28 @@
+"""
+    This program is made for fun, feel free to edit it.
+
+    All the Rubik Cube's move are made according to this site: https://jperm.net/3x3/moves
+    Made by Gabro_29
+
+"""
+
+import random
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from random import randrange
+import threading
+from colorama import Fore
+from colorama import init as colorama_init
+from time import time
+
+colorama_init(autoreset=True)
+rubik_cube = list()
 
 
-def faces(num_faces: str, face: str, translate: list, rotate: list, color_1="white", color_2="blue", color_3="white", color_line="black"):
+def faces(num_faces: str, face: str, translate: list, rotate: list, color_1="white", color_2="blue", color_3="white",
+          color_line="black"):
     """Create the face base on color"""
 
     facesbuff = (
@@ -84,7 +101,8 @@ def faces(num_faces: str, face: str, translate: list, rotate: list, color_1="whi
     glRotated(-rotate[0], (rotate[1]), (rotate[2]), (rotate[3]))
 
 
-def faccie_pos(num_faces: str, face: str, translate: list, rotate: list, color_1="white", color_2="blue", color_3="white", color_line="black"):
+def faces_pos(num_faces: str, face: str, translate: list, rotate: list, color_1="white", color_2="blue",
+              color_3="white", color_line="black"):
     """Adjust pos of faces on the screen"""
 
     faces(num_faces, face, translate, rotate, color_1, color_2, color_3, color_line)
@@ -94,65 +112,65 @@ def faccie_pos(num_faces: str, face: str, translate: list, rotate: list, color_1
 def f_layer(layer: list):
     """Create the first layer"""
 
-    faccie_pos("three", "THREE", [0, 3, 0], [90, 0, -1, 0], layer[0][0], layer[0][1], layer[0][2])
+    faces_pos("three", "THREE", [0, 3, 0], [90, 0, -1, 0], layer[0][0], layer[0][1], layer[0][2])
 
-    faccie_pos("two", "TWO", [2, 3, 0], [90, 0, 0, 1], layer[1][0], layer[1][1])
+    faces_pos("two", "TWO", [2, 3, 0], [90, 0, 0, 1], layer[1][0], layer[1][1])
 
-    faccie_pos("three", "THREE", [4, 3, 0], [0, 0, 0, 0], layer[2][0], layer[2][1], layer[2][2])
+    faces_pos("three", "THREE", [4, 3, 0], [0, 0, 0, 0], layer[2][0], layer[2][1], layer[2][2])
 
-    faccie_pos("two", "TWO", [4, 3, -2], [90, -1, 0, 0], layer[3][0], layer[3][1])
+    faces_pos("two", "TWO", [4, 3, -2], [90, -1, 0, 0], layer[3][0], layer[3][1])
 
-    faccie_pos("three", "THREE", [4, 3, -4], [90, -1, 0, 0], layer[4][0], layer[4][1], layer[4][2])
+    faces_pos("three", "THREE", [4, 3, -4], [90, -1, 0, 0], layer[4][0], layer[4][1], layer[4][2])
 
-    faccie_pos("two", "TWO", [2, 3, -4], [180, 1, 1, 0], layer[5][0], layer[5][1])
+    faces_pos("two", "TWO", [2, 3, -4], [180, 1, 1, 0], layer[5][0], layer[5][1])
 
-    faccie_pos("three", "THREE", [0, 3, -4], [180, 0, -1, 0], layer[6][0], layer[6][1], layer[6][2])
+    faces_pos("three", "THREE", [0, 3, -4], [180, 0, -1, 0], layer[6][0], layer[6][1], layer[6][2])
 
-    faccie_pos("two", "TWO", [0, 3, -2], [180, 0, 1, 1], layer[7][0], layer[7][1])
+    faces_pos("two", "TWO", [0, 3, -2], [180, 0, 1, 1], layer[7][0], layer[7][1])
 
-    faccie_pos("one", "ONE", [2, 3, -2], [180, 1, 1, 0], layer[8][0])
+    faces_pos("one", "ONE", [2, 3, -2], [180, 1, 1, 0], layer[8][0])
 
 
 def s_layer(layer: list):
     """Create the second layer"""
 
-    faccie_pos("two", "TWO", [0, 1, 0], [90, 0, -1, 0], layer[0][0], layer[0][1])
+    faces_pos("two", "TWO", [0, 1, 0], [90, 0, -1, 0], layer[0][0], layer[0][1])
 
-    faccie_pos("one", "ONE", [2, 1, 2], [90, 0, 1, 0], layer[1][0])
+    faces_pos("one", "ONE", [2, 1, 2], [90, 0, 1, 0], layer[1][0])
 
-    faccie_pos("two", "TWO", [4, 1, 0], [180, 1, 0, 1], layer[2][0], layer[2][1])
+    faces_pos("two", "TWO", [4, 1, 0], [180, 1, 0, 1], layer[2][0], layer[2][1])
 
-    faccie_pos("one", "ONE", [4, 1, -2], [0, 0, 0, 0], layer[3][0])
+    faces_pos("one", "ONE", [4, 1, -2], [0, 0, 0, 0], layer[3][0])
 
-    faccie_pos("two", "TWO", [4, 1, -4], [90, 0, 1, 0], layer[4][0], layer[4][1])
+    faces_pos("two", "TWO", [4, 1, -4], [90, 0, 1, 0], layer[4][0], layer[4][1])
 
-    faccie_pos("one", "ONE", [2, 1, -4], [90, 0, 1, 0], layer[5][0])
+    faces_pos("one", "ONE", [2, 1, -4], [90, 0, 1, 0], layer[5][0])
 
-    faccie_pos("two", "TWO", [0, 1, -4], [180, 1, 0, -1], layer[6][0], layer[6][1])
+    faces_pos("two", "TWO", [0, 1, -4], [180, 1, 0, -1], layer[6][0], layer[6][1])
 
-    faccie_pos("one", "ONE", [-2, 1, -2], [0, 0, 0, 0], layer[7][0])
+    faces_pos("one", "ONE", [-2, 1, -2], [0, 0, 0, 0], layer[7][0])
 
 
 def t_layer(layer: list):
     """Create the third layer"""
 
-    faccie_pos("three", "THREE", [0, -1, 0], [180, 0, 0, 1], layer[0][0], layer[0][1], layer[0][2])
+    faces_pos("three", "THREE", [0, -1, 0], [180, 0, 0, 1], layer[0][0], layer[0][1], layer[0][2])
 
-    faccie_pos("two", "TWO", [2, -1, 0], [90, 0, 0, -1], layer[1][0], layer[1][1])
+    faces_pos("two", "TWO", [2, -1, 0], [90, 0, 0, -1], layer[1][0], layer[1][1])
 
-    faccie_pos("three", "THREE", [4, -1, 0], [90, 0, 0, -1], layer[2][0], layer[2][1], layer[2][2])
+    faces_pos("three", "THREE", [4, -1, 0], [90, 0, 0, -1], layer[2][0], layer[2][1], layer[2][2])
 
-    faccie_pos("two", "TWO", [4, -1, -2], [90, 1, 0, 0], layer[3][0], layer[3][1])
+    faces_pos("two", "TWO", [4, -1, -2], [90, 1, 0, 0], layer[3][0], layer[3][1])
 
-    faccie_pos("three", "THREE", [4, -1, -4], [180, -100, -1, 0], layer[4][0], layer[4][1], layer[4][2])
+    faces_pos("three", "THREE", [4, -1, -4], [180, -100, -1, 0], layer[4][0], layer[4][1], layer[4][2])
 
-    faccie_pos("two", "TWO", [2, -1, -4], [180, -100, 100, -1], layer[5][0], layer[5][1])
+    faces_pos("two", "TWO", [2, -1, -4], [180, -100, 100, -1], layer[5][0], layer[5][1])
 
-    faccie_pos("three", "THREE", [0, -1, -4], [180, -1, 1, 0], layer[6][0], layer[6][1], layer[6][2])
+    faces_pos("three", "THREE", [0, -1, -4], [180, -1, 1, 0], layer[6][0], layer[6][1], layer[6][2])
 
-    faccie_pos("two", "TWO", [0, -1, -2], [180, 0, -100, 100], layer[7][0], layer[7][1])
+    faces_pos("two", "TWO", [0, -1, -2], [180, 0, -100, 100], layer[7][0], layer[7][1])
 
-    faccie_pos("one", "ONE", [2, -3, -2], [90, 0, -1, 100], layer[8][0])
+    faces_pos("one", "ONE", [2, -3, -2], [90, 0, -1, 100], layer[8][0])
 
 
 def u_first_animation(m, cube: list):
@@ -210,6 +228,24 @@ def u_animation(m: int, cube: list):
         pygame.display.flip()
 
 
+def r_animation(m: int, cube: list):
+    """R animation"""
+
+    while m < 90:
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        s_layer([cube[9], cube[10], cube[20], cube[12], cube[3], cube[14], cube[15], cube[16]])
+        t_layer([cube[17], cube[18], cube[21], cube[13], cube[4], cube[22], cube[23], cube[24], cube[25]])
+        # Move first layer
+        glPushMatrix()
+        glTranslated(2, 0, -2)
+        glRotated(m, 1, 0, 0)
+        f_layer([cube[0], cube[1], cube[19], cube[11], cube[2], cube[5], cube[6], cube[7], cube[8]])
+        glTranslated(-2, 0, 2)
+        glPopMatrix()
+        m += 7
+        pygame.display.flip()
+
+
 def m_animation(m: int, cube: list):
     """M animation"""
 
@@ -247,6 +283,42 @@ def m_first_animation(m: int, cube: list):
         glRotated(m, 0, 1, 0)
         glTranslated(-2, 0, 2)
         s_layer(cube[9:17])
+        glPopMatrix()
+        m += 7
+        pygame.display.flip()
+
+
+def e_animation(m: int, cube: list):
+    """E animation"""
+
+    while m < 90:
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        f_layer(cube[:9])
+        t_layer(cube[17:])
+        # Move first layer
+        glPushMatrix()
+        glTranslated(2, 0, -2)
+        glRotated(m, 0, -1, 0)
+        glTranslated(-2, 0, 2)
+        s_layer(cube[9:17])
+        glPopMatrix()
+        m += 7
+        pygame.display.flip()
+
+
+def d_animation(m: int, cube: list):
+    """D animation"""
+
+    while m < 90:
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        f_layer(cube[:9])
+        s_layer(cube[9:17])
+        # Move first layer
+        glPushMatrix()
+        glTranslated(2, 0, -2)
+        glRotated(m, 0, -1, 0)
+        glTranslated(-2, 0, 2)
+        t_layer(cube[17:])
         glPopMatrix()
         m += 7
         pygame.display.flip()
@@ -329,7 +401,7 @@ def sexy_animation(m: int, cube: list):
     cube = z_move(cube)
     z_animation(m, cube)
     cube = z_move(cube)
-    u_first_animation(m, cube)
+    u_animation(m, cube)
     cube = u_move(cube)
     z_animation(m, cube)
     cube = z_move(cube)
@@ -428,6 +500,43 @@ def u_move(cube: list):
     return temp_cube
 
 
+def r_move(cube: list):
+    """Take the cube, do a movement and give it back with update position"""
+
+    temp_cube = list()
+    temp_pos = list()
+    count = 0
+    for face in cube:
+        if count in (11, 20, 13, 3):
+            temp_cube.append([face[1], face[0]])
+        elif count == 19:
+            temp_cube.append([face[2], face[0], face[1]])
+        elif count == 4:
+            temp_cube.append([face[0], face[1], face[2]])
+        elif count == 21:
+            temp_cube.append([face[1], face[2], face[0]])
+        else:
+            temp_cube.append(face)
+
+        count += 1
+
+    # 3 faces
+    temp_2 = temp_cube[2]
+    temp_cube[2] = temp_cube[19]
+    temp_cube[19] = temp_cube[21]
+    temp_cube[21] = temp_cube[4]
+    temp_cube[4] = temp_2
+
+    # 2 faces
+    temp_3 = temp_cube[3]
+    temp_cube[3] = temp_cube[11]
+    temp_cube[11] = temp_cube[20]
+    temp_cube[20] = temp_cube[13]
+    temp_cube[13] = temp_3
+
+    return temp_cube
+
+
 def m_move(cube: list):
     """Take the cube, do a movement and give it back with update position"""
 
@@ -491,7 +600,74 @@ def m_first_move(cube: list):
     return temp_cube
 
 
-def x_first_move(cube):
+def e_move(cube: list):
+    """Take the cube, do a movement and give it back with update position"""
+
+    temp_cube = list()
+    temp_pos = list()
+    count = 0
+    for face in cube:
+        if count in (9, 11, 13, 15):
+            temp_cube.append([face[1], face[0]])
+        else:
+            temp_cube.append(face)
+        count += 1
+
+    # Change central faces
+    temp_9 = temp_cube[9]
+    temp_cube[9] = temp_cube[11]
+    temp_10 = temp_cube[10]
+    temp_cube[10] = temp_cube[12]
+    temp_11 = temp_cube[11]
+    temp_cube[11] = temp_cube[13]
+
+    temp_cube[12] = temp_cube[14]
+    temp_cube[13] = temp_cube[15]
+    temp_cube[14] = temp_cube[16]
+    temp_cube[15] = temp_9
+    temp_cube[16] = temp_10
+
+    return temp_cube
+
+
+def d_move(cube: list):
+    """Take the cube, do a movement and give it back with update position"""
+
+    temp_cube = list()
+    temp_pos = list()
+    count = 0
+    for face in cube:
+        if count in (18, 20, 22, 24):
+            temp_cube.append([face[1], face[0]])
+        elif count == 19:
+            temp_cube.append([face[1], face[2], face[0]])
+        elif count == 21:
+            temp_cube.append([face[2], face[0], face[1]])
+        elif count == 23:
+            temp_cube.append([face[1], face[2], face[0]])
+        elif count == 17:
+            temp_cube.append([face[2], face[0], face[1]])
+        else:
+            temp_cube.append(face)
+        count += 1
+
+    # Change central faces
+    temp_17 = temp_cube[17]
+    temp_cube[17] = temp_cube[19]
+    temp_cube[19] = temp_cube[21]
+    temp_cube[21] = temp_cube[23]
+    temp_cube[23] = temp_17
+
+    temp_18 = temp_cube[18]
+    temp_cube[18] = temp_cube[20]
+    temp_cube[20] = temp_cube[22]
+    temp_cube[22] = temp_cube[24]
+    temp_cube[24] = temp_18
+
+    return temp_cube
+
+
+def x_first_move(cube: list):
     """Take the cube and rotate it, so place on top the face to move"""
 
     temp_cube = list()
@@ -545,7 +721,6 @@ def x_first_move(cube):
     temp_cube[7] = temp_cube[15]
     temp_cube[15] = temp_cube[24]
     temp_cube[24] = temp_9
-
 
     return temp_cube
 
@@ -639,6 +814,15 @@ def sexy_move(cube: list):
     return cube
 
 
+def drawText(x: int, y: int, text: str, font):
+    """Print on the screen how many times is shuffling the cube"""
+
+    textSurface = font.render(text, True, (255, 255, 66, 255)).convert_alpha()
+    textData = pygame.image.tostring(textSurface, "RGBA", True)
+    glWindowPos2d(x, y)
+    glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
+
 def shuffle(cycle, cube: list):
     """Take the cube and move the faces to messy the all cube"""
 
@@ -651,13 +835,1484 @@ def shuffle(cycle, cube: list):
     return cube
 
 
-def drawText(x: int, y: int, text: str, font):
-    """Print on the screen how many times is shuffling the cube"""
-    
-    textSurface = font.render(text, True, (255, 255, 66, 255)).convert_alpha()
-    textData = pygame.image.tostring(textSurface, "RGBA", True)
-    glWindowPos2d(x, y)
-    glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+# Average execution time 6.58 over 100 cycles after shluffle every time
+def first_white(cube: list):
+    """Try to solve the Cube via Layer Algorithm"""
+
+    print("Start to place the White face on top\nThen find the Orange+White element and move it\nto the correct position")
+
+    # Move white face on the top
+    for index in range(len(cube)):
+        if cube[index] == ["white"]:
+            if index == 14:
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+            elif index == 10:
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+            elif index == 16:
+                z_animation(1, cube)
+                cube = z_move(cube)
+            elif index == 25:
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+            elif index == 12:
+                z_animation(1, cube)
+                cube = z_move(cube)
+                z_animation(1, cube)
+                cube = z_move(cube)
+                z_animation(1, cube)
+                cube = z_move(cube)
+
+    # Start to build The White Cross
+    start = time()
+    try:
+        orange_ind = cube.index(["white", "orange"])
+    except ValueError:
+        orange_ind = 2
+
+    z_done = 0
+    x_first_done = 0
+
+    while True:
+
+        # Make some choice on the move to do
+        while True:
+            a = random.randrange(6)
+            if a == 3 and z_done == 4:
+                continue
+            elif a == 4 and x_first_done == 4:
+                continue
+            else:
+                break
+
+        if a == 0:  # M
+            m_animation(1, cube)
+            cube = m_move(cube)
+            z_done = 0
+            x_first_done = 0
+        elif a == 1:  # U'
+            u_animation(1, cube)
+            cube = u_move(cube)
+            z_done = 0
+            x_first_done = 0
+        elif a == 2:  # M'
+            m_first_animation(1, cube)
+            cube = m_first_move(cube)
+            z_done = 0
+            x_first_done = 0
+        elif a == 3:  # Z
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_done += 1
+        elif a == 4:  # X'
+            x_first_animation(1, cube)
+            cube = x_first_move(cube)
+            x_first_done += 1
+        elif a == 5:
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+            z_done = 0
+            x_first_done = 0
+
+        # Make again white element on top
+        for index in range(len(cube)):
+            if cube[index] == ["white"]:
+                if index == 14:
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                elif index == 10:
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                elif index == 16:
+                    z_animation(1, cube)
+                    cube = z_move(cube)
+                elif index == 25:
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                elif index == 12:
+                    z_animation(1, cube)
+                    cube = z_move(cube)
+                    z_animation(1, cube)
+                    cube = z_move(cube)
+                    z_animation(1, cube)
+                    cube = z_move(cube)
+
+        try:
+            orange_ind = cube.index(["white", "orange"])
+        except ValueError:
+            orange_ind = cube.index(["orange", "white"])
+
+        try:
+            if orange_ind == 1 and cube[orange_ind] == ["white", "orange"]:
+                break
+        except ValueError:
+            pass
+
+    end = time()
+    print("White element and Orange+White element placed in" + Fore.RED + f" {round(end - start, 2)} " + Fore.RESET + "seconds.....Move on next")
+
+    return cube
+
+
+def white_cross(cube: list):
+    """Make white cross after made first_white function"""
+
+    # Get the indexs
+    def get_index(cube: list):
+        try:
+            green_ind = cube.index(["green", "white"])
+        except ValueError:
+            green_ind = cube.index(["white", "green"])
+
+        try:
+            red_ind = cube.index(["white", "red"])
+        except ValueError:
+            red_ind = cube.index(["red", "white"])
+
+        try:
+            blue_ind = cube.index(["blue", "white"])
+        except ValueError:
+            blue_ind = cube.index(["white", "blue"])
+
+        return green_ind, red_ind, blue_ind
+
+    # Possible moves to do whitout touch white and orange
+    def right_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    def left_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    green_ind, red_ind, blue_ind = get_index(cube)
+
+    # Try right moves to get one piece of the cross
+    k = 0
+    element_in_3_pos = ""
+    element_in_7_pos = ""
+
+    print(
+        "Lets find out the next element:\n-" + Fore.GREEN + "Green" + Fore.RESET + "+White\n-" + Fore.BLUE + "Blue" + Fore.RESET + "+White" + "\n-" + Fore.RED + "Red" + Fore.RESET + "+White")
+
+    while cube[3] != ["green", "white"] and cube[7] != ["blue", "white"] and cube[5] != ["white", "red"]:
+        k = 0
+        element_in_3_pos = ""
+        element_in_7_pos = ""
+
+        while k < 4:
+            cube = right_move(cube)
+            green_ind, red_ind, blue_ind = get_index(cube)
+            if green_ind == 3 or red_ind == 3 or blue_ind == 3:
+                if green_ind == 3:
+                    element_in_3_pos = "green"
+                elif red_ind == 3:
+                    element_in_3_pos = "red"
+                else:
+                    element_in_3_pos = "blue"
+                break
+            else:
+                element_in_3_pos = "none"
+                k += 1
+
+        # Move found element in the correct position base on the color
+        if element_in_3_pos == "green":
+            if cube[green_ind] == ["green", "white"]:
+                pass
+            else:
+                cube = right_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+        elif element_in_3_pos == "red":
+            if cube[red_ind] == ["red", "white"]:
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+            else:
+                cube = right_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+        elif element_in_3_pos == "blue":
+            if cube[blue_ind] == ["white", "blue"]:
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                z_animation(1, cube)
+                cube = z_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+            else:
+                cube = right_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                cube = right_move(cube)
+                cube = right_move(cube)
+                cube = right_move(cube)
+                cube = u_first_move(cube)
+                u_first_animation(1, cube)
+                cube = u_first_move(cube)
+                u_first_animation(1, cube)
+        elif element_in_3_pos == "none":
+            k = 0
+            while k < 4:
+                cube = left_move(cube)
+                green_ind, red_ind, blue_ind = get_index(cube)
+                if green_ind == 7 or red_ind == 7 or blue_ind == 7:
+                    if green_ind == 7:
+                        element_in_7_pos = "green"
+                    elif red_ind == 7:
+                        element_in_7_pos = "red"
+                    else:
+                        element_in_7_pos = "blue"
+                    break
+                else:
+                    element_in_7_pos = "none"
+                    k += 1
+
+            if element_in_7_pos == "green":
+                if cube[green_ind] == ["green", "white"]:
+                    cube = left_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    cube = right_move(cube)
+                    cube = right_move(cube)
+                    cube = right_move(cube)
+                else:
+                    cube = left_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+            elif element_in_7_pos == "red":
+                if cube[red_ind] == ["red", "white"]:
+                    cube = left_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    cube = left_move(cube)
+                    cube = left_move(cube)
+                    cube = left_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                else:
+                    cube = left_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+            elif element_in_7_pos == "blue":
+                if cube[blue_ind] == ["blue", "white"]:
+                    pass
+                else:
+                    cube = left_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+            else:
+                d_animation(1, cube)
+                cube = d_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+
+    # Now I have 3 white element on the first layer
+    # Look for the third white element by doing left move
+    green_ind, red_ind, blue_ind = get_index(cube)
+
+    if green_ind == 3:
+        print("I have found the Green+White element")
+    elif red_ind == 5:
+        print("I have found the Red+White element")
+    elif blue_ind == 7:
+        print("I have found the Blue+White element")
+
+    if green_ind == 3:
+        print("So move on to find the Blue+White or the Red+White element")
+        while cube[7] != ["blue", "white"] and cube[5] != ["white", "red"]:
+            k = 0
+            element_in_7_pos = ""
+
+            while k < 4:
+                cube = left_move(cube)
+                green_ind, red_ind, blue_ind = get_index(cube)
+                if red_ind == 7 or blue_ind == 7:
+                    if red_ind == 7:
+                        element_in_7_pos = "red"
+                    else:
+                        element_in_7_pos = "blue"
+                    break
+                else:
+                    element_in_7_pos = "none"
+                    k += 1
+
+            if element_in_7_pos == "red":
+                if cube[red_ind] == ["red", "white"]:
+                    # print("Ho trovato il rosso", cube[red_ind])
+                    cube = left_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    cube = left_move(cube)
+                    cube = left_move(cube)
+                    cube = left_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                else:
+                    # print("Ho trovato il rosso", cube[red_ind])
+                    cube = left_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+            elif element_in_7_pos == "blue":
+                if cube[blue_ind] == ["blue", "white"]:
+                    pass
+                else:
+                    # print("Ho trovato il blu", cube[blue_ind])
+                    cube = left_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+            elif element_in_7_pos == "none":
+                d_animation(1, cube)
+                cube = d_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+
+    elif blue_ind == 7:
+        print("So move on to find the Green+White or the Red+White element")
+        while cube[3] != ["green", "white"] and cube[5] != ["white", "red"]:
+            k = 0
+            element_in_3_pos = ""
+            while k < 4:
+                cube = right_move(cube)
+                green_ind, red_ind, blue_ind = get_index(cube)
+                if green_ind == 3 or red_ind == 3:
+                    if green_ind == 3:
+                        element_in_3_pos = "green"
+                    elif red_ind == 3:
+                        element_in_3_pos = "red"
+                    break
+                else:
+                    element_in_3_pos = "none"
+                    k += 1
+
+            # Move found element in the correct position base on the color
+            if element_in_3_pos == "green":
+                if cube[green_ind] == ["green", "white"]:
+                    pass
+                else:
+                    # print("Ho trovato il verde", cube[green_ind])
+                    cube = right_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+            elif element_in_3_pos == "red":
+                if cube[red_ind] == ["red", "white"]:
+                    # print("Ho trovato il rosso", cube[red_ind])
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                else:
+                    # print("Ho trovato il rosso", cube[red_ind])
+                    cube = right_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+            elif element_in_3_pos == "none":
+                d_animation(1, cube)
+                cube = d_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                u_animation(1, cube)
+                cube = u_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+                x_first_animation(1, cube)
+                cube = x_first_move(cube)
+
+    else:  # RED
+        print("So move on to find the Green+White or the Blue+White element")
+        while cube[3] != ["green", "white"] and cube[7] != ["blue", "white"]:
+            k = 0
+            element_in_3_pos = ""
+            element_in_7_pos = ""
+
+            while k < 4:
+                cube = right_move(cube)
+                green_ind, red_ind, blue_ind = get_index(cube)
+                if green_ind == 3 or blue_ind == 3:
+                    if green_ind == 3:
+                        element_in_3_pos = "green"
+                    else:
+                        element_in_3_pos = "blue"
+                    break
+                else:
+                    element_in_3_pos = "none"
+                    k += 1
+
+            # Move found element in the correct position base on the color
+            if element_in_3_pos == "green":
+                if cube[green_ind] == ["green", "white"]:
+                    pass
+                else:
+                    # print("Ho trovato il verde", cube[green_ind])
+                    cube = right_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+            elif element_in_3_pos == "blue":
+                if cube[blue_ind] == ["white", "blue"]:
+                    # print("Ho trovato il blu", cube[blue_ind])
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    z_animation(1, cube)
+                    cube = z_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                else:
+                    # print("Ho trovato il blu", cube[blue_ind])
+                    cube = right_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    cube = right_move(cube)
+                    cube = right_move(cube)
+                    cube = right_move(cube)
+                    cube = u_first_move(cube)
+                    u_first_animation(1, cube)
+                    cube = u_first_move(cube)
+                    u_first_animation(1, cube)
+            elif element_in_3_pos == "none":
+                k = 0
+                while k < 4:
+                    cube = left_move(cube)
+                    green_ind, red_ind, blue_ind = get_index(cube)
+                    if green_ind == 7 or blue_ind == 7:
+                        if green_ind == 7:
+                            element_in_7_pos = "green"
+                        else:
+                            element_in_7_pos = "blue"
+                        break
+                    else:
+                        element_in_7_pos = "none"
+                        k += 1
+
+                if element_in_7_pos == "green":
+                    if cube[green_ind] == ["green", "white"]:
+                        # print("Ho trovato il verde", cube[green_ind])
+                        cube = left_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        cube = right_move(cube)
+                        cube = right_move(cube)
+                        cube = right_move(cube)
+                    else:
+                        # print("Ho trovato il verde", cube[green_ind])
+                        cube = left_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        u_animation(1, cube)
+                        cube = u_move(cube)
+                elif element_in_7_pos == "blue":
+                    if cube[blue_ind] == ["blue", "white"]:
+                        pass
+                    else:
+                        # print("Ho trovato il blu", cube[blue_ind])
+                        cube = left_move(cube)
+                        u_animation(1, cube)
+                        cube = u_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        x_first_animation(1, cube)
+                        cube = x_first_move(cube)
+                        u_first_animation(1, cube)
+                        cube = u_first_move(cube)
+                else:
+                    d_animation(1, cube)
+                    cube = d_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    u_animation(1, cube)
+                    cube = u_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+                    x_first_animation(1, cube)
+                    cube = x_first_move(cube)
+
+    # Now I have three white element on the first layer
+    # Lets find out the fourth one
+
+    green_ind, red_ind, blue_ind = get_index(cube)
+
+    if green_ind == 3 and red_ind == 5:
+        print("I have found Green+White and Red+White...Lets find out the Blue+White")
+    elif blue_ind == 7 and red_ind == 5:
+        print("I have found Blue+White and Red+White...Lets find out the Green+White")
+    elif blue_ind == 7 and green_ind == 3:
+        print("I have found Green+White and Blue+White...Lets find out the Red+White")
+
+    if green_ind == 3 and red_ind == 5:
+        while cube[7] != ["blue", "white"]:
+            green_ind, red_ind, blue_ind = get_index(cube)
+            if blue_ind in (15, 24, 9):
+                cube = left_move(cube)
+            elif blue_ind in (11, 13):
+                e_animation(1, cube)
+                cube = e_move(cube)
+            elif blue_ind in (18, 20, 22):
+                d_animation(1, cube)
+                cube = d_move(cube)
+            elif cube[7] == ["white", "blue"]:
+                cube = left_move(cube)
+                e_animation(1, cube)
+                cube = e_move(cube)
+                e_animation(1, cube)
+                cube = e_move(cube)
+                e_animation(1, cube)
+                cube = e_move(cube)
+                cube = left_move(cube)
+
+    elif blue_ind == 7 and red_ind == 5:
+        while cube[3] != ["green", "white"]:
+            green_ind, red_ind, blue_ind = get_index(cube)
+            if green_ind in (13, 20, 11):
+                cube = right_move(cube)
+            elif green_ind in (9, 15):
+                e_animation(1, cube)
+                cube = e_move(cube)
+            elif green_ind in (18, 24, 22):
+                d_animation(1, cube)
+                cube = d_move(cube)
+            elif cube[3] == ["white", "green"]:
+                cube = right_move(cube)
+                e_animation(1, cube)
+                cube = e_move(cube)
+                cube = right_move(cube)
+
+    elif blue_ind == 7 and green_ind == 3:
+        while cube[5] != ["white", "red"]:
+            u_animation(1, cube)
+            cube = u_move(cube)
+            green_ind, red_ind, blue_ind = get_index(cube)
+            if red_ind in (13, 20, 11):
+                cube = right_move(cube)
+            elif red_ind in (9, 15):
+                e_animation(1, cube)
+                cube = e_move(cube)
+            elif red_ind in (18, 24, 22):
+                d_animation(1, cube)
+                cube = d_move(cube)
+            elif cube[3] == ["white", "red"]:
+                cube = right_move(cube)
+                e_animation(1, cube)
+                cube = e_move(cube)
+                cube = right_move(cube)
+
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+
+    print("""White cross completed...\nNow I align the color by moving the second layer""")
+
+    while cube[10] != ["orange"]:
+        e_animation(1, cube)
+        cube = e_move(cube)
+
+    print("""White cross completed and single element color aligned""")
+
+    return cube
+
+
+def white_face(cube: list):
+    """Complete the White face"""
+
+    def right_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    def left_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    print("Start to solve White face....First place it on the bottom")
+
+    # Put white face on the bottom
+    z_animation(1, cube)
+    cube = z_move(cube)
+    z_animation(1, cube)
+    cube = z_move(cube)
+
+    # Let's find the White+Orange+Blue element
+    WOB_index = 0
+    for index in range(len(cube)):
+        if "white" in cube[index] and "orange" in cube[index] and "blue" in cube[index]:
+            WOB_index = index
+            print(f"White+Orange+Blue element found in position {WOB_index}")
+
+    # Put the found element in the correct position
+    while cube[19] != ["white", "orange", "blue"]:
+        if WOB_index in (2, 19):
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+        elif WOB_index in (0, 6, 4):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif WOB_index == 17:
+            cube = left_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+        elif WOB_index == 23:
+            z_animation(1, cube)
+            cube = z_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+        elif WOB_index == 21:
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            u_animation(1, cube)
+            cube = u_move(cube)
+            u_animation(1, cube)
+            cube = u_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            sexy_animation(1, cube)
+            cub = sexy_move(cube)
+            u_animation(1, cube)
+            cube = u_move(cube)
+            cube = right_move(cube)
+            cube = right_move(cube)
+
+        for index in range(len(cube)):
+            if "white" in cube[index] and "orange" in cube[index] and "blue" in cube[index]:
+                WOB_index = index
+
+
+    # Let's find the White+Orange+Green element
+    WOG_index = 0
+    for index in range(len(cube)):
+        if "white" in cube[index] and "orange" in cube[index] and "green" in cube[index]:
+            WOG_index = index
+            print(f"White+Orange+Green element found in position {WOG_index}")
+
+    # Put the found element in the correct position
+    while cube[17] != ['green', 'orange', 'white']:
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+        for index in range(len(cube)):
+            if "white" in cube[index] and "orange" in cube[index] and "green" in cube[index]:
+                WOG_index = index
+
+        if WOG_index in (2, 19):
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+        elif WOG_index in (0, 6, 4):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif WOG_index == 17:
+            cube = left_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+        elif WOG_index == 23:
+            z_animation(1, cube)
+            cube = z_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+            z_animation(1, cube)
+            cube = z_move(cube)
+
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+
+    # Let's find the White+Green+Red element
+    WGR_index = 0
+    for index in range(len(cube)):
+        if "white" in cube[index] and "green" in cube[index] and "red" in cube[index]:
+            WGR_index = index
+            print(f"White+Green+Red element found in position {WGR_index}")
+
+    # Put the found element in the correct position
+    while cube[23] != ['white', 'red', 'green']:
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+        for index in range(len(cube)):
+            if "white" in cube[index] and "green" in cube[index] and "red" in cube[index]:
+                WGR_index = index
+
+        if WGR_index in (2, 19):
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+        elif WGR_index in (0, 6, 4):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif WGR_index == 17:
+            cube = left_move(cube)
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+            cube = left_move(cube)
+
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+    # Let's find the White+Red+Blue element
+    WRB_index = 0
+    for index in range(len(cube)):
+        if "white" in cube[index] and "blue" in cube[index] and "red" in cube[index]:
+            WRB_index = index
+            print(f"White+Red+Blue element found in position {WRB_index}")
+
+    # Put the found element in the correct position
+    while cube[21] != ['blue', 'red', 'white']:
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+        for index in range(len(cube)):
+            if "white" in cube[index] and "blue" in cube[index] and "red" in cube[index]:
+                WRB_index = index
+
+        if WRB_index in (2, 19):
+            sexy_animation(1, cube)
+            cube = sexy_move(cube)
+        elif WRB_index in (0, 6, 4):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+        d_animation(1, cube)
+        cube = d_move(cube)
+
+
+    print("White face completed!")
+
+    return cube
+
+
+def second_layer(cube: list):
+    """Move on second layer"""
+
+    def right_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    def left_move(cube: list):
+        z_animation(1, cube)
+        cube = z_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+        z_animation(1, cube)
+        cube = z_move(cube)
+
+        return cube
+
+    def move_to_left(cube: list):
+        """Move element from top layer to second"""
+
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        cube = left_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        cube = left_move(cube)
+        cube = left_move(cube)
+        cube = left_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+
+        return cube
+
+    def move_to_right(cube: list):
+        """Move element from top layer to second"""
+
+        u_animation(1, cube)
+        cube = u_move(cube)
+        cube = right_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        cube = right_move(cube)
+        cube = right_move(cube)
+        cube = right_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+
+
+        return cube
+
+
+    # Let's find the Orange+Blue element
+    OB_index = 0
+    for index in range(len(cube)):
+        if "orange" in cube[index] and "blue" in cube[index] and len(cube[index]) == 2:
+            OB_index = index
+            print(f"Orange+Blue element found in position {OB_index}")
+
+    while cube[1] != ["blue", "orange"]:
+
+        if OB_index in (3, 5, 7):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif OB_index == 15:
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            cube = move_to_left(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+        elif OB_index == 13:
+            e_animation(1, cube)
+            cube = e_move(cube)
+            cube = move_to_right(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+        elif OB_index == 11:
+            cube = move_to_right(cube)
+        elif OB_index == 9:
+            cube = move_to_left(cube)
+        elif cube[1] == ["orange", "blue"]:
+            cube = move_to_left(cube)
+            cube = move_to_left(cube)
+
+        for index in range(len(cube)):
+            if "orange" in cube[index] and "blue" in cube[index] and len(cube[index]) == 2:
+                OB_index = index
+
+    cube = move_to_right(cube)
+
+    # Let's find the Orange+Blue element
+    OG_index = 0
+    for index in range(len(cube)):
+        if "orange" in cube[index] and "green" in cube[index] and len(cube[index]) == 2:
+            OG_index = index
+            print(f"Orange+Green element found in position {OG_index}")
+
+    while cube[1] != ["green", "orange"]:
+
+        if OG_index in (3, 5, 7):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif OG_index == 15:
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            cube = move_to_left(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+        elif OG_index == 13:
+            e_animation(1, cube)
+            cube = e_move(cube)
+            cube = move_to_right(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+            e_animation(1, cube)
+            cube = e_move(cube)
+        elif OG_index == 9:
+            cube = move_to_left(cube)
+        elif cube[1] == ["orange", "green"]:
+            cube = move_to_left(cube)
+            cube = move_to_left(cube)
+
+        for index in range(len(cube)):
+            if "orange" in cube[index] and "green" in cube[index] and len(cube[index]) == 2:
+                OG_index = index
+
+    cube = move_to_left(cube)
+
+    # Let's find the Red+Blue element
+    RB_index = 0
+    for index in range(len(cube)):
+        if "red" in cube[index] and "blue" in cube[index] and len(cube[index]) == 2:
+            RB_index = index
+            print(f"Red+Blue element found in position {RB_index}")
+
+    e_animation(1, cube)
+    cube = e_move(cube)
+    e_animation(1, cube)
+    cube = e_move(cube)
+
+    while cube[1] != ["blue", "red"]:
+
+        for index in range(len(cube)):
+            if "red" in cube[index] and "blue" in cube[index] and len(cube[index]) == 2:
+                RB_index = index
+
+        if RB_index in (3, 5, 7):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif RB_index == 11:
+            cube = move_to_right(cube)
+        elif RB_index == 20:
+            cube = move_to_right(cube)
+            cube = move_to_right(cube)
+        elif RB_index == 9:
+            cube = move_to_left(cube)
+        elif cube[1] == ["red", "blue"]:
+            cube = move_to_left(cube)
+            cube = move_to_left(cube)
+
+    cube = move_to_left(cube)
+
+    # Let's find the Red+Green element
+    RG_index = 0
+    for index in range(len(cube)):
+        if "red" in cube[index] and "green" in cube[index] and len(cube[index]) == 2:
+            RG_index = index
+            print(f"Red+Green element found in position {RG_index}")
+
+    while cube[1] != ["green", "red"]:
+
+        for index in range(len(cube)):
+            if "red" in cube[index] and "green" in cube[index] and len(cube[index]) == 2:
+                RG_index = index
+
+        if RG_index in (3, 5, 7):
+            u_first_animation(1, cube)
+            cube = u_first_move(cube)
+        elif RG_index == 11:
+            cube = move_to_right(cube)
+        elif cube[1] == ["red", "green"]:
+            cube = move_to_right(cube)
+            cube = move_to_right(cube)
+
+    cube = move_to_right(cube)
+    e_animation(1, cube)
+    cube = e_move(cube)
+    e_animation(1, cube)
+    cube = e_move(cube)
+
+    print("Second layer completed!")
+
+    return cube
+
+
+def third_layer(cube: list):
+    """Move on third layer"""
+
+    def l_to_cross(cube: list):
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        cube = sexy_move(cube)
+        cube = sexy_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+
+        return cube
+
+    def t_to_cross(cube: list):
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_animation(1, cube)
+        cube = u_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        cube = sexy_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+        u_first_animation(1, cube)
+        cube = u_first_move(cube)
+        x_first_animation(1, cube)
+        cube = x_first_move(cube)
+
+        return cube
+
+    # See if there is an L on the Yellow face
+    print("Let's see if there is an L on the top layer")
+    k = 0
+    L_found = False
+    T_found = False
+    while True:
+        if cube[7][1] == "yellow" and cube[5][0] == "yellow" and cube[3][1] != "yellow":
+            L_found = True
+            break
+        elif "yellow" == cube[7][1] and cube[3][1] == "yellow":
+            T_found = True
+            break
+        elif k == 5:
+            break
+        u_animation(1, cube)
+        cube = u_move(cube)
+        k += 1
+
+
+    if L_found: # OK
+        print("L found....going to make Yellow Cross")
+        cube = l_to_cross(cube)
+    elif T_found: # OK
+        print("T found....going to make Yellow Cross")
+        cube = t_to_cross(cube)
+
+        if cube[7][1] == "yellow" and cube[5][0] == "yellow" and cube[3][1] != "yellow":
+            cube = l_to_cross(cube)
+
+    else:
+        print("Nothing found...going to make Yellow Cross from single element")
+        cube = l_to_cross(cube)
+        k = 0
+        L_found = False
+        T_found = False
+        while True:
+            if cube[7][1] == "yellow" and cube[5][0] == "yellow" and cube[3][1] != "yellow":
+                L_found = True
+                break
+            elif "yellow" == cube[7][1] and cube[3][1] == "yellow":
+                T_found = True
+                break
+            elif k == 4:
+                break
+            u_animation(1, cube)
+            cube = u_move(cube)
+            k += 1
+
+        if L_found:
+            print("L found....going to make Yellow Cross")
+            cube = l_to_cross(cube)
+        elif T_found:
+            print("T found....going to make Yellow Cross")
+            cube = t_to_cross(cube)
+
+    return cube
+
+
+def solving():
+    global rubik_cube
+
+    start = time()
+
+    rubik_cube = first_white(rubik_cube)
+    rubik_cube = white_cross(rubik_cube)
+    rubik_cube = white_face(rubik_cube)
+    rubik_cube = second_layer(rubik_cube)
+    rubik_cube = third_layer(rubik_cube)
+
+    end = time()
+
+    print(f"Cube solved in {round(end - start, 2)}")
 
 
 def main():
@@ -677,12 +2332,11 @@ def main():
                    ["blue", "yellow"], ["yellow"]]
 
     # Build the cube base on previous layers
-    rubik_cube = list()
+    global rubik_cube
     for layer in (first_layer, second_layer, third_layer):
         lay = layer
         for face in lay:
             rubik_cube.append(face)
-
 
     # Initialize pygame gui
     pygame.init()
@@ -698,7 +2352,6 @@ def main():
     glTranslatef(-1.0, 1.0, -25)  # Camera view
     glRotatef(45, 1, 1, 1)  # Prospective view
 
-
     # No overlapping
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LESS)
@@ -706,12 +2359,14 @@ def main():
     # Extra variables
     u_first_key = False
     u_key = False
+    r_key = False
     m_key = False
     m_first_key = False
     z_key = False
     x_first_key = False
     shuffle_key = False
     sexy_key = False
+    first_white_key = False
     cycle = 0
     m = 1
     prev_pos_x = 0
@@ -722,6 +2377,7 @@ def main():
 
         # Check for pressed keys
         for event in pygame.event.get():
+            # print(rubik_cube)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -730,8 +2386,8 @@ def main():
                     glRotatef(20, 0, -1, 0)
                 if event.key == pygame.K_f:  # Change camera view
                     glRotatef(20, 0, 1, 0)
-                if event.key == pygame.K_s:  # Change camera view
-                    glRotatef(10, 0, 2, 1)
+                # if event.key == pygame.K_s:  # Change camera view
+                #     glRotatef(10, 0, 2, 1)
                 if event.key == pygame.K_d:  # Change camera view
                     glRotatef(90, 1, 0, 0)
                 if event.key == pygame.K_ESCAPE:  # Exit
@@ -747,14 +2403,32 @@ def main():
                     u_animation(m, rubik_cube)
                     u_key = True
 
+                if event.key == pygame.K_r:
+                    d_animation(m, rubik_cube)
+                    r_key = True
+
                 # M Move
                 if event.key == pygame.K_v:
                     m_animation(m, rubik_cube)
+                    rubik_cube = m_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
                     m_key = True
 
                 # M' Move
                 if event.key == pygame.K_c:
-                    x_first_animation(m, rubik_cube)
+                    m_first_animation(m, rubik_cube)
+                    rubik_cube = m_first_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
+                    z_animation(m, rubik_cube)
+                    rubik_cube = z_move(rubik_cube)
                     m_first_key = True
 
                 # Z Move
@@ -778,6 +2452,10 @@ def main():
                     shuffle_animation(cycle, m, rubik_cube, font)
                     shuffle_key = True
 
+                # First White
+                if event.key == pygame.K_q:
+                    first_white_key = True
+
         # Mouse Camera
         for event in pygame.mouse.get_pressed(3):
             if event:
@@ -785,11 +2463,11 @@ def main():
                     glRotatef(20, 1, 0, 0)  # Camera view
                 elif abs(prev_pos_y - pygame.mouse.get_pos()[1]) == 0:
                     glRotatef(20, 0, 1, 0)  # Camera view
-                elif abs(prev_pos_y - pygame.mouse.get_pos()[1]) > 1 and abs(prev_pos_x - pygame.mouse.get_pos()[0]) > 1:
+                elif abs(prev_pos_y - pygame.mouse.get_pos()[1]) > 1 and abs(
+                        prev_pos_x - pygame.mouse.get_pos()[0]) > 1:
                     glRotatef(20, 1, 1, 0)  # Camera view
             prev_pos_x = pygame.mouse.get_pos()[0]
             prev_pos_y = pygame.mouse.get_pos()[1]
-
 
         # Clear view
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -800,11 +2478,12 @@ def main():
         elif u_key:
             rubik_cube = u_move(rubik_cube)
             u_key = False
+        elif r_key:
+            rubik_cube = d_move(rubik_cube)
+            r_key = False
         elif m_key:
-            rubik_cube = m_move(rubik_cube)
             m_key = False
         elif m_first_key:
-            rubik_cube = m_first_move(rubik_cube)
             m_first_key = False
         elif x_first_key:
             rubik_cube = x_first_move(rubik_cube)
@@ -818,14 +2497,27 @@ def main():
         elif sexy_key:
             rubik_cube = sexy_move(rubik_cube)
             sexy_key = False
+        elif first_white_key:
+            print("Start to solving the cube")
+            if rubik_cube[8] == ["white"] and rubik_cube[1] == ["white", "orange"] and rubik_cube[3] == ["green", "white"] \
+                    and rubik_cube[5] == ["white", "red"] and rubik_cube[7] == ["blue", "white"]:
+                print("White cross already completed")
+                # rubik_cube = white_face(rubik_cube)
+            else:
+                threading.Thread(target=solving()).start()
+
+            first_white_key = False
 
         # Show updated layer
         f_layer(rubik_cube[:9])
         s_layer(rubik_cube[9:17])
         t_layer(rubik_cube[17:])
-
         pygame.display.flip()
         pygame.time.wait(20)
+
+        # start = time.time()
+        # end = time.time()
+        # print(end - start)
 
 
 if __name__ == '__main__':
